@@ -1,0 +1,16 @@
+# Folders
+bot/
+
+# Config files
+.env
+
+# Databases
+*.db
+*.sqlite
+*.sql
+
+# Compiled files
+*.pyc
+
+# IDE files
+.idea
