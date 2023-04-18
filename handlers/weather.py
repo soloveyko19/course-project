@@ -74,7 +74,8 @@ def get_weather(callback: CallbackQuery):
                     f'Максимальна температура: {day["temp_max"]}°С\n' \
                     f'Мінімальна температура: {day["temp_min"]}°С\n' \
                     f'Фаза місяця: {day["moon_phase"]}\n' \
-                    f'Погода: {day["narrative"]}\n\n'
+                    f'Світанок: {day["sunrise"].strftime("%H:%M")}\n' \
+                    f'Захід сонця: {day["sunset"].strftime("%H:%M")}\n\n'
         bot.send_message(callback.message.chat.id, text)
     weather_start(callback.message)
 

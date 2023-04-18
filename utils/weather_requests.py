@@ -2,10 +2,6 @@ import requests
 import json
 from config.conf import RAPIDAPI_KEY
 from datetime import datetime as dt
-from translate.translate import Translator
-
-
-trans = Translator(to_lang='uk')
 
 
 headers = {
@@ -17,7 +13,7 @@ headers = {
 def get_cities(city_name: str):
     querystring = {
         'query': city_name,
-        'language': 'uk_UK'
+        'language': 'uk-UA'
     }
     url = "https://weather338.p.rapidapi.com/locations/search"
 
@@ -38,7 +34,7 @@ def get_city_detail(city_id):
     url = 'https://weather338.p.rapidapi.com/locations/get-details'
     querystring = {
         "placeid": city_id,
-        "language": "uk_UK"
+        "language": "uk-UA"
     }
     response = requests.get(headers=headers, params=querystring, url=url, timeout=5)
     if response.status_code == 200:
@@ -58,7 +54,7 @@ def get_weather_hourly(latitude, longitude):
         "date": dt.now().strftime('%Y%m%d'),
         "latitude": latitude,
         "longitude": longitude,
-        "language": "uk_UK",
+        "language": "uk-UA",
         "units": "m"
     }
     response = requests.get(url=url, params=querystring, headers=headers, timeout=5)
@@ -83,7 +79,7 @@ def get_today_weather(latitude, longitude):
         "date": dt.now().strftime('%Y%m%d'),
         "latitude": latitude,
         "longitude": longitude,
-        "language": "uk_UK",
+        "language": "uk-UA",
         "units": "m"
     }
     response = requests.get(url=url, params=querystring, headers=headers, timeout=5)
@@ -95,7 +91,7 @@ def get_today_weather(latitude, longitude):
                           info['v3-location-point']['location']['adminDistrict'] + \
                           ', ' + \
                           info['v3-location-point']['location']['country']
-        weather['weather'] = trans.translate(info['v3-wx-observations-current']['cloudCoverPhrase'])
+        weather['weather'] = info['v3-wx-observations-current']['cloudCoverPhrase']
         weather['temp_day'] = info['v3-wx-observations-current']['temperatureMax24Hour']
         weather['temp_night'] = info['v3-wx-observations-current']['temperatureMin24Hour']
         weather['temp'] = info['v3-wx-observations-current']['temperature']
@@ -116,7 +112,7 @@ def get_10_days_weather(latitude, longitude):
         "date": dt.now().strftime('%Y%m%d'),
         "latitude": latitude,
         "longitude": longitude,
-        "language": "uk_UK",
+        "language": "uk-UA",
         "units": "m"
     }
     response = requests.get(url=url, params=querystring, headers=headers, timeout=5)
@@ -125,11 +121,12 @@ def get_10_days_weather(latitude, longitude):
         weather = list()
         for i in range(10):
             new_day = dict()
-            new_day['day_of_week'] = trans.translate(info['v3-wx-forecast-daily-15day']['dayOfWeek'][i])
-            new_day['temp_max'] = info['v3-wx-forecast-daily-15day']['calendarDayTemperatureMax'][i]
-            new_day['temp_min'] = info['v3-wx-forecast-daily-15day']['calendarDayTemperatureMin'][i]
-            new_day['moon_phase'] = trans.translate(info['v3-wx-forecast-daily-15day']['moonPhase'][i])
-            new_day['narrative'] = trans.translate(info['v3-wx-forecast-daily-15day']['narrative'][i])
+            new_day['day_of_week'] = info['v3-wx-forecast-daily-15day']['dayOfWeek'][i]
+            new_day['temp_max'] = info['v3-wx-forecast-daily-15day']['temperatureMax'][i]
+            new_day['temp_min'] = info['v3-wx-forecast-daily-15day']['temperatureMin'][i]
+            new_day['moon_phase'] = info['v3-wx-forecast-daily-15day']['moonPhase'][i]
+            new_day['sunrise'] = dt.fromisoformat(info['v3-wx-forecast-daily-15day']['sunriseTimeLocal'][i][:-5])
+            new_day['sunset'] = dt.fromisoformat(info['v3-wx-forecast-daily-15day']['sunsetTimeLocal'][i][:-5])
             weather.append(new_day)
         return weather
 
