@@ -1,7 +1,7 @@
 import peewee
 import os
 
-path = os.path.abspath(os.path.join('database', 'db.sqlite3'))
+path = os.path.abspath(os.path.join("database", "db.sqlite3"))
 db = peewee.SqliteDatabase(path)
 
 
