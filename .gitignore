@@ -6,7 +6,7 @@ bot/
 
 # Databases
 *.db
-*.sqlite
+*.sqlite3
 *.sql
 
 # Compiled files
