@@ -1,3 +1,7 @@
+"""
+Module which contains states
+"""
+
 from telebot.handler_backends import StatesGroup, State
 
 

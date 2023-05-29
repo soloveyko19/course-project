@@ -1,3 +1,7 @@
+"""
+Config module
+"""
+
 from dotenv import load_dotenv, find_dotenv, dotenv_values
 
 if not find_dotenv():

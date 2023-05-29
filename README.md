@@ -1,16 +1,16 @@
-Курсовий проект з теми "Телеграм бот на Python"
---------------
-> #### Про цей проект
-> Цей проект був створений для роботи с API по прогнозу погоди.
-> API розміщенний на сайті rapidapi.com
+Course project on the topic "Telegram bot on Python"
+-----------------------------------------------
+> #### About this project
+> This project was created to make life easier for people,
+> namely to quickly and very conveniently check the weather in the messenger.
 
-### Як почати роботу з ботом
-По перше потрібно клонувати репозиторій до вашого ПК. Далі слід встановити
-залежнусті командою ***pip install -r requirements.txt***. Після
-чого, треба творити файл ".env" по шаблону який міститься
-в репозиторії під назвою ".env.template". В цьому файлі необхідно
-вказати токен вашого бота який ви отримали у BotFather та ключ
-від API за посиланням <a href="https://rapidapi.com/apidojo/api/weather338/">rapidapi.com</a>.
-Якщо все зроблено правильно, то можна запускати бота. Щоб це зробити
-потрібно написати в консолі команду ***python main.py***. Після чого бот 
-почне працювати.
+### How to start working with a bot
+1. Clone repository.
+2. Create a file in root directory of project with name ".env".
+3. Register at [rapidapi.com](https://rapidapi.com).
+4. Subscribe for [API](https://rapidapi.com/apidojo/api/weather338/), where receive a key for API.
+5. Search a BotFather in Telegram, and create a new bot.
+6. Fill in the ".env" file according to the sample (".env.template").
+7. Create a virtual environment and connect the dependencies with the ```python pip install -r requirements.txt``` command
+8. Launch the project by ```python main.py``` command.
+9. Enjoy the work of the bot

@@ -1,3 +1,7 @@
+"""
+The module intended for sending a http requests to weather API
+"""
+
 import requests
 import json
 from config.conf import RAPIDAPI_KEY
@@ -11,6 +15,14 @@ headers = {
 
 
 def get_cities(city_name: str):
+    """
+    Function to get a dict of cities where key is name and value is keys at API
+
+    Args:
+        city_name (str): name of city to search
+
+    Returns: Dict of cities where key is name of city and key is key of city at API
+    """
     querystring = {"query": city_name, "language": "uk-UA"}
     url = "https://weather338.p.rapidapi.com/locations/search"
 
@@ -18,16 +30,23 @@ def get_cities(city_name: str):
     if response.status_code == 200:
         cities = dict()
         all_info = dict(json.loads(response.text))
-        for number, location in enumerate(all_info["location"]["address"]):
-            cities[location] = all_info["location"]["placeId"][number]
-            if number == 4:
-                break
-        return cities
-    else:
-        return None
+        if all_info.get("location"):
+            for number, location in enumerate(all_info["location"]["address"]):
+                cities[location] = all_info["location"]["placeId"][number]
+                if number == 4:
+                    break
+            return cities
 
 
 def get_city_detail(city_id):
+    """
+    Function to get city detail like as latitude longitude and correct name of city
+
+    Args:
+        city_id: key of city in API
+
+    Returns: dict which contains latitude? longitude and name of the city
+    """
     url = "https://weather338.p.rapidapi.com/locations/get-details"
     querystring = {"placeid": city_id, "language": "uk-UA"}
     response = requests.get(headers=headers, params=querystring, url=url, timeout=100)
@@ -38,11 +57,18 @@ def get_city_detail(city_id):
         city["longitude"] = info["location"]["longitude"]
         city["city_name"] = info["location"]["city"]
         return city
-    else:
-        return None
 
 
 def get_weather_hourly(latitude, longitude):
+    """
+    Function to get weather hourly
+
+    Args:
+        latitude: latitude of selected city
+        longitude: longitude of selected city
+
+    Returns: dict with info about weather hourly
+    """
     url = "https://weather338.p.rapidapi.com/weather/forecast"
     querystring = {
         "date": dt.now().strftime("%Y%m%d"),
@@ -53,28 +79,21 @@ def get_weather_hourly(latitude, longitude):
     }
     response = requests.get(url=url, params=querystring, headers=headers, timeout=100)
     if response.status_code == 200:
-        all_info = json.loads(response.text)
-        my_info = list()
-        for i in range(24):
-            new_info = dict()
-            new_info["time"] = dt.fromisoformat(
-                all_info["vt1runweatherhourly"]["fcstValidLocal"][i][:-5]
-            )
-            new_info["d_or_n"] = all_info["vt1runweatherhourly"]["dayInd"][i]
-            new_info["temperature"] = int(
-                (
-                    (int(all_info["vt1runweatherhourly"]["temperature"][i]) - 32)
-                    * (5 / 9)
-                )
-            )
-            new_info["rain_prob"] = all_info["vt1runweatherhourly"]["precipPct"][i]
-            new_info["cloud_cover"] = all_info["vt1runweatherhourly"]["cloudPct"][i]
-            new_info["wind_speed"] = all_info["vt1runweatherhourly"]["windSpeed"][i]
-            my_info.append(new_info)
-        return my_info
+        info = dict(json.loads(response.text))
+        info = info.get("v3-wx-forecast-hourly-10day")
+        return info
 
 
 def get_today_weather(latitude, longitude):
+    """
+    Function to get weather today
+
+    Args:
+        latitude: latitude of selected city
+        longitude: longitude of selected city
+
+    Returns: dict with info about weather for today
+    """
     url = "https://weather338.p.rapidapi.com/weather/forecast"
     querystring = {
         "date": dt.now().strftime("%Y%m%d"),
@@ -85,34 +104,21 @@ def get_today_weather(latitude, longitude):
     }
     response = requests.get(url=url, params=querystring, headers=headers, timeout=100)
     if response.status_code == 200:
-        try:
-            info = json.loads(response.text)
-            weather = dict()
-            weather["city"] = info["v3-location-point"]["location"]["city"]
-            weather["weather"] = info["v3-wx-observations-current"]["cloudCoverPhrase"]
-            weather["temp_day"] = info["v3-wx-observations-current"]["temperatureMax24Hour"]
-            weather["temp_night"] = info["v3-wx-observations-current"]["temperatureMin24Hour"]
-            weather["temp"] = info["v3-wx-observations-current"]["temperature"]
-            weather["temp_like"] = info["v3-wx-observations-current"]["temperatureFeelsLike"]
-            weather["wind_speed"] = info["v3-wx-observations-current"]["windSpeed"]
-            weather["request_time"] = dt.fromisoformat(
-                info["v3-wx-observations-current"]["validTimeLocal"][:-5]
-            )
-            weather["sunrise"] = dt.fromisoformat(
-                info["v3-wx-observations-current"]["sunriseTimeLocal"][:-5]
-            )
-            weather["sunset"] = dt.fromisoformat(
-                info["v3-wx-observations-current"]["sunsetTimeLocal"][:-5]
-            )
-            weather["pressure"] = info["v3-wx-observations-current"]["pressureAltimeter"]
-            return weather
-        except TypeError:
-            return None
-    else:
-        return None
+        info = dict(json.loads(response.text))
+        info = info.get("v3-wx-observations-current")
+        return info
 
 
 def get_10_days_weather(latitude, longitude):
+    """
+    Function to get weather today
+
+    Args:
+        latitude: latitude of selected city
+        longitude: longitude of selected city
+
+    Returns: dict with info about weather for 10 days
+    """
     url = "https://weather338.p.rapidapi.com/weather/forecast"
     querystring = {
         "date": dt.now().strftime("%Y%m%d"),
@@ -121,21 +127,8 @@ def get_10_days_weather(latitude, longitude):
         "language": "uk-UA",
         "units": "m",
     }
-    response = requests.get(url=url, params=querystring, headers=headers, timeout=5)
+    response = requests.get(url=url, params=querystring, headers=headers, timeout=100)
     if response.status_code == 200:
-        info = json.loads(response.text)
-        weather = list()
-        for i in range(10):
-            new_day = dict()
-            new_day["day_of_week"] = info["v3-wx-forecast-daily-15day"]["dayOfWeek"][i]
-            new_day["temp_max"] = info["v3-wx-forecast-daily-15day"]["temperatureMax"][i]
-            new_day["temp_min"] = info["v3-wx-forecast-daily-15day"]["temperatureMin"][i]
-            new_day["moon_phase"] = info["v3-wx-forecast-daily-15day"]["moonPhase"][i]
-            new_day["sunrise"] = dt.fromisoformat(
-                info["v3-wx-forecast-daily-15day"]["sunriseTimeLocal"][i][:-5]
-            )
-            new_day["sunset"] = dt.fromisoformat(
-                info["v3-wx-forecast-daily-15day"]["sunsetTimeLocal"][i][:-5]
-            )
-            weather.append(new_day)
-        return weather
+        info = dict(json.loads(response.text))
+        info = info["v3-wx-forecast-daily-15day"]["daypart"][0]
+        return info

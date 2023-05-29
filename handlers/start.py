@@ -1,3 +1,7 @@
+"""
+Module instead for bot command "/start"
+"""
+
 from telebot.types import Message, CallbackQuery
 from loader import bot
 from keyboards.inline import inline_keyboad_by_dict
@@ -9,6 +13,13 @@ from database.functions import new_user
 
 @bot.message_handler(commands=["start"])
 def start(message: Message) -> None:
+    """
+    Message handler which catching the command "/start"
+    If user is new, him get into database
+
+    Args:
+        message (Message): user's message
+    """
     if new_user(message.from_user.id):
         bot.send_message(
             message.chat.id,
@@ -30,12 +41,18 @@ def start(message: Message) -> None:
 
 
 @bot.callback_query_handler(
-    func=lambda data: data.data in ("weather", "change_city", "help")
+    func=lambda callback: callback.data in ("weather", "change_city", "help")
 )
-def start_callback(callback: CallbackQuery):
+def start_callback(callback: CallbackQuery) -> None:
+    """
+    Callback handler which catching data with something what user want to do
+
+    Args:
+        callback (CallbackQuery): callback which user sent from keyboard
+    """
     if callback.data == "weather":
         weather_start(message=callback.message)
     elif callback.data == "change_city":
         change_city(message=callback.message)
     elif callback.data == "help":
-        help(callback.message)
+        help(message=callback.message)
